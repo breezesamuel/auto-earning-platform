@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付成功 - AI Money Maker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            animation: scaleIn 0.5s ease-out;
+        }
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        .success-icon::after {
+            content: '✓';
+            font-size: 40px;
+            color: white;
+            font-weight: bold;
+        }
+        h1 {
+            color: #1f2937;
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+        p {
+            color: #6b7280;
+            font-size: 1.1rem;
+            margin-bottom: 32px;
+        }
+        .plan-info {
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .plan-info h3 {
+            color: #10b981;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        .plan-info p {
+            color: #4b5563;
+            margin: 4px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        .features {
+            text-align: left;
+            margin: 24px 0;
+        }
+        .features li {
+            padding: 8px 0;
+            color: #374151;
+            list-style: none;
+        }
+        .features li::before {
+            content: '✓';
+            color: #10b981;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon"></div>
+        <h1>支付成功！</h1>
+        <p>您的订阅已激活，所有功能现已解锁</p>
+        
+        <div class="plan-info">
+            <h3 id="planName">季度订阅</h3>
+            <p>有效期: <span id="validDays">90天</span></p>
+            <p>AI生成额度: <span id="credits">1800次</span></p>
+        </div>
+        
+        <ul class="features">
+            <li>无限AI生成次数</li>
+            <li>优先技术支持</li>
+            <li>全部高级模板库</li>
+            <li>API访问权限</li>
+            <li>定制化集成服务</li>
+        </ul>
+        
+        <a href="/" class="cta-button">开始使用</a>
+    </div>
+    
+    <script>
+        // 从URL参数获取信息
+        const params = new URLSearchParams(window.location.search);
+        const orderId = params.get('order_id');
+        const userId = params.get('uid');
+        
+        if (orderId && userId) {
+            console.log('Payment verified:', orderId, userId);
+        }
+    </script>
+</body>
+</html>

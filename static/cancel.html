@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付取消 - AI Money Maker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .cancel-icon {
+            width: 80px;
+            height: 80px;
+            background: #f3f4f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            border: 3px solid #e5e7eb;
+        }
+        .cancel-icon::after {
+            content: '✕';
+            font-size: 36px;
+            color: #9ca3af;
+            font-weight: bold;
+        }
+        h1 {
+            color: #374151;
+            font-size: 1.75rem;
+            margin-bottom: 12px;
+        }
+        p {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        .button-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+        }
+        .btn-secondary:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        .help-text {
+            margin-top: 32px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="cancel-icon"></div>
+        <h1>支付已取消</h1>
+        <p>我们理解您的决定。您仍然可以继续使用免费额度。<br>随时欢迎回来体验更多功能。</p>
+        
+        <div class="button-group">
+            <a href="/" class="btn btn-primary">返回首页</a>
+            <a href="/pricing" class="btn btn-secondary">查看套餐</a>
+        </div>
+        
+        <div class="help-text">
+            💡 提示：免费套餐包含每月10次AI生成额度，足够日常使用<br>
+            🎁 新用户注册即可获得额外5次免费额度
+        </div>
+    </div>
+</body>
+</html>

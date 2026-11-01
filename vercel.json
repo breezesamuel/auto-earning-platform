@@ -1,11 +1,13 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/payment.js", "use": "@vercel/node" }
+    { "src": "api/payment.js", "use": "@vercel/node" },
+    { "src": "static/*.html", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/payment.js" },
-    { "src": "/payment/(.*)", "dest": "/api/payment.js" },
+    { "src": "/success", "dest": "/static/success.html" },
+    { "src": "/cancel", "dest": "/static/cancel.html" },
     { "src": "/(.*)", "dest": "/static/$1" }
   ],
   "env": {
