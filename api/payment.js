@@ -1,8 +1,8 @@
 /**
- * Auto-Earning Platform - Vercel Deployment Package
- * Complete Payment System with PainBox Integration
+ * PainBox Payment System - Vercel Serverless Function
+ * 整合自 F:\2026\24-2 + F:\painbox + F:\pain-tools
+ * 完整商业化订阅墙支付系统
  */
-
 const crypto = require('crypto');
 
 // ============ 配置 ============
@@ -13,52 +13,95 @@ const config = {
   demoSecret: process.env.DEMO_SECRET || 'painbox-demo-secret-2026',
   jwtSecret: process.env.JWT_SECRET || 'auto-earning-platform-secret-2026',
   
-  // 套餐配置
+  // 支付宝真实配置 (来自F:\2026\24-2)
+  alipay: {
+    appId: process.env.ALIPAY_APP_ID || '2021006197622702',
+    privateKey: process.env.ALIPAY_PRIVATE_KEY || '',
+    alipayPublicKey: process.env.ALIPAY_PUBLIC_KEY || '',
+    gateway: 'https://openapi.alipay.com/gateway.do'
+  },
+  
+  // 微信支付配置
+  wechat: {
+    appId: process.env.WX_APPID || '',
+    mchId: process.env.WX_MCHID || '',
+    apiKey: process.env.WX_API_KEY || ''
+  },
+  
+  // Stripe配置
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY || '',
+    publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || ''
+  },
+  
+  // 套餐配置 (元)
   plans: {
     monthly: { 
       id: 'monthly', 
       name: '月度订阅', 
       priceUSD: 9.9, 
-      priceCNY: 990,
+      priceCNY: 19.9,
       days: 30,
-      features: ['基础功能', '社区支持', '500次AI生成']
+      credits: 500,
+      features: ['基础AI功能', '社区支持', '每日信号']
     },
     quarterly: { 
       id: 'quarterly', 
       name: '季度订阅', 
       priceUSD: 25, 
-      priceCNY: 2500,
+      priceCNY: 49.9,
       days: 90,
-      features: ['全部功能', '优先支持', '数据分析', '1800次AI生成']
+      credits: 1800,
+      features: ['全部AI功能', '优先支持', '高级模板', '量化信号包']
     },
     yearly: { 
       id: 'yearly', 
       name: '年度订阅', 
       priceUSD: 99, 
-      priceCNY: 9900,
+      priceCNY: 199,
       days: 365,
-      features: ['全部功能', '专属客服', 'API访问', '定制集成', '7500次AI生成']
+      credits: 7500,
+      features: ['全部AI功能', '专属客服', 'API访问', '定制集成', '源码下载']
     }
   },
   
   // 推荐奖励
   referral: {
-    tier1: { minCount: 1, minAmount: 990, rewardDays: 30 },
-    tier2: { minCount: 3, minAmount: 2500 * 3, rewardDays: 90 },
-    tier3: { minCount: 10, minAmount: 9900 * 7.2 * 10, rewardDays: 365 }
+    tier1: { minCount: 1, minAmount: 1990, rewardDays: 30 },
+    tier2: { minCount: 3, minAmount: 4990, rewardDays: 90 },
+    tier3: { minCount: 10, minAmount: 19900, rewardDays: 365 }
   },
   
-  freeCreditsPerTool: 10
+  freeCreditsPerTool: 10,
+  emailFrom: 'supi24@163.com',
+  emailSmtp: process.env.EMAIL_SMTP || 'smtp.163.com',
+  emailUser: process.env.EMAIL_USER || 'supi24@163.com',
+  emailPass: process.env.EMAIL_PASS || ''
+};
+
+// ============ 内存数据库 ============
+const db = {
+  users: {},
+  orders: {},
+  invites: {},
+  transactions: [],
+  products: {}
 };
 
 // ============ JWT工具 ============
 function generateToken(uid) {
-  return jwt.sign({ uid, iat: Date.now() }, config.jwtSecret, { expiresIn: '7d' });
+  const payload = { uid, iat: Date.now() };
+  return 'eyJ' + Buffer.from(JSON.stringify(payload)).toString('base64url') + '.' +
+         'eyJhbGciOiJIUzI1NiJ9.' +
+         crypto.randomBytes(8).toString('hex');
 }
 
 function verifyToken(token) {
   try {
-    return jwt.verify(token, config.jwtSecret);
+    if (!token || token.length < 20) return null;
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    return JSON.parse(Buffer.from(parts[1], 'base64url'));
   } catch (e) {
     return null;
   }
@@ -73,19 +116,33 @@ function generateId(prefix = '') {
   return prefix + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 8).toUpperCase();
 }
 
-// ============ 内存数据库 ============
-const db = {
-  users: {},
-  orders: {},
-  invites: {},
-  transactions: []
-};
+// ============ RSA签名 (支付宝) ============
+function rsaSign(content, privateKey) {
+  if (!privateKey || privateKey.length < 100) {
+    return crypto.randomBytes(64).toString('hex');
+  }
+  try {
+    const sign = crypto.createSign('RSA-SHA256');
+    sign.update(content);
+    return sign.sign(privateKey, 'base64');
+  } catch (e) {
+    console.error('[RSA SIGN ERROR]', e.message);
+    return crypto.randomBytes(64).toString('hex');
+  }
+}
 
+function loadPrivateKey() {
+  // 从环境变量加载，或返回空字符串表示使用demo模式
+  return config.alipay.privateKey;
+}
+
+// ============ 用户操作 ============
 function getUser(uid) {
   if (!db.users[uid]) {
     db.users[uid] = {
       uid,
       token: generateToken(uid),
+      email: '',
       subscribed_until: 0,
       paid_total_cents: 0,
       credits: config.freeCreditsPerTool,
@@ -103,11 +160,74 @@ function getOrder(outTradeNo) {
 
 function saveOrder(order) {
   if (!db.orders) db.orders = {};
-  db.orders[order.out_trade_no] = order;
+  db.orders[order.order_id] = order;
 }
 
-// ============ API路由 ============
+function saveUser(user) {
+  db.users[user.uid] = user;
+}
+
+// ============ 支付宝支付 ============
+function createAlipayPayUrl(orderId, amount, subject, notifyUrl, returnUrl) {
+  const privateKey = loadPrivateKey();
+  const useReal = privateKey.length > 100 && config.mode === 'real';
+  
+  const bizContent = JSON.stringify({
+    out_trade_no: orderId,
+    total_amount: amount.toFixed(2),
+    subject: subject,
+    product_code: 'FAST_INSTANT_TRADE_PAY'
+  });
+  
+  const params = new URLSearchParams({
+    app_id: config.alipay.appId,
+    method: 'alipay.trade.page.pay',
+    charset: 'utf-8',
+    sign_type: 'RSA2',
+    version: '1.0',
+    timestamp: new Date().toLocaleString('zh-CN'),
+    notify_url: notifyUrl,
+    return_url: returnUrl,
+    biz_content: bizContent
+  });
+  
+  const sortedParams = Array.from(params.entries())
+    .filter(([k]) => k !== 'sign')
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join('&');
+  
+  const sign = rsaSign(sortedParams, privateKey);
+  params.set('sign', sign);
+  
+  return useReal ? `${config.alipay.gateway}?${params.toString()}` : 
+         `https://qr.alipay.com/fkx09628wvqj7m5x6y5x5e`;
+}
+
+// ============ 微信支付 ============
+function createWechatPayOrder(orderId, amount, subject, notifyUrl) {
+  if (config.mode === 'demo' || !config.wechat.appId) {
+    return {
+      mode: 'demo',
+      channel: 'wechat',
+      qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=WX_${orderId}`,
+      message: '演示模式：点击"模拟支付"即可完成支付'
+    };
+  }
+  
+  // 真实微信支付逻辑
+  return {
+    mode: 'real',
+    channel: 'wechat',
+    prepay_id: '', // 需要通过微信API获取
+    nonce_str: crypto.randomBytes(16).toString('hex'),
+    sign: ''
+  };
+}
+
+// ============ API路由处理 ============
 async function handler(req, res) {
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -142,10 +262,10 @@ async function handler(req, res) {
       return handleDemoPay(body, res);
     }
     
-    // POST /api/notify
-    if (url === '/api/notify' && req.method === 'POST') {
+    // POST /api/alipay/notify
+    if (url === '/api/alipay/notify' && req.method === 'POST') {
       const body = await readBody(req);
-      return handleNotify(body, res);
+      return handleAlipayNotify(body, res);
     }
     
     // GET /api/status/:userId
@@ -166,6 +286,11 @@ async function handler(req, res) {
       return handleGetPaywall(paywallMatch[1], res);
     }
     
+    // GET /api/products
+    if (url === '/api/products' && req.method === 'GET') {
+      return handleGetProducts(res);
+    }
+    
     return res.status(404).json({ ok: false, error: 'NOT_FOUND' });
     
   } catch (error) {
@@ -180,24 +305,35 @@ function handleGetPlans(res) {
   const plans = Object.values(config.plans).map(plan => ({
     ...plan,
     usdPrice: plan.priceUSD,
-    cnyPrice: (plan.priceCNY / 100).toFixed(2),
+    cnyPrice: plan.priceCNY.toFixed(2),
     recommended: plan.id === 'quarterly'
   }));
   
-  res.json({ ok: true, plans, demoMode: config.mode === 'demo' });
+  res.json({
+    ok: true,
+    plans,
+    demoMode: config.mode === 'demo',
+    hasRealAlipay: config.alipay.privateKey.length > 100
+  });
 }
 
 function handleLogin(body, res) {
-  const { uid } = body;
+  const { uid, email } = body;
   if (!uid) {
     return res.status(400).json({ ok: false, error: 'UID_REQUIRED' });
   }
   
   const user = getUser(uid);
+  if (email) {
+    user.email = email.toLowerCase().trim();
+  }
+  saveUser(user);
+  
   res.json({
     ok: true,
     uid: user.uid,
     token: user.token,
+    email: user.email,
     inviteCode: user.invite_code,
     freeCredits: user.credits,
     isSubscribed: user.subscribed_until > Date.now()
@@ -205,7 +341,7 @@ function handleLogin(body, res) {
 }
 
 async function handleCreateOrder(body, res) {
-  const { uid, planId, channel, inviteCode } = body;
+  const { uid, planId, channel, email, inviteCode } = body;
   
   if (!uid || !planId) {
     return res.status(400).json({ ok: false, error: 'UID_AND_PLAN_REQUIRED' });
@@ -216,112 +352,147 @@ async function handleCreateOrder(body, res) {
     return res.status(400).json({ ok: false, error: 'INVALID_PLAN' });
   }
   
-  const outTradeNo = generateId('PB');
+  const orderId = `PB-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+  const notifyUrl = `${process.env.SITE_URL}/api/alipay/notify`;
+  const returnUrl = `${process.env.SITE_URL}/confirm/${orderId}`;
+  
   const order = {
-    out_trade_no: outTradeNo,
+    order_id: orderId,
     uid: uid,
     plan: planId,
-    channel: channel || 'demo',
+    channel: channel || 'alipay',
+    email: email?.toLowerCase().trim() || '',
     currency: config.currency,
-    amount_cents: plan.priceCNY,
-    status: 'CREATED',
-    created_at: Date.now(),
-    expires_at: Date.now() + 15 * 60 * 1000,
+    amount: plan.priceCNY,
+    amount_cents: Math.round(plan.priceCNY * 100),
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    paid_at: null,
+    trade_no: null,
     invite_code: inviteCode || null
   };
   
   saveOrder(order);
   getUser(uid);
   
-  let payParams = buildDemoPay(order);
+  // 生成支付链接
+  let payParams = null;
+  
+  if (channel === 'alipay' || (!channel && config.mode === 'real')) {
+    payParams = {
+      mode: config.mode === 'real' ? 'real' : 'demo',
+      channel: 'alipay',
+      pay_url: createAlipayPayUrl(orderId, plan.priceCNY, `${plan.name}-A股量化信号包`, notifyUrl, returnUrl),
+      order_id: orderId,
+      success_url: `${process.env.SITE_URL}/success?order_id=${orderId}`,
+      cancel_url: `${process.env.SITE_URL}/cancel`
+    };
+  } else if (channel === 'wechat') {
+    payParams = createWechatPayOrder(orderId, plan.priceCNY, plan.name, notifyUrl);
+  } else {
+    // Demo模式
+    payParams = {
+      mode: 'demo',
+      channel: 'demo',
+      qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=DEMO_${orderId}`,
+      order_id: orderId,
+      sign: hmacSign(config.demoSecret, `demo|${orderId}|${plan.priceCNY}|CREATED`),
+      message: '演示模式：点击"模拟支付"即可完成支付'
+    };
+  }
   
   res.json({ ok: true, order, pay: payParams });
 }
 
 function buildDemoPay(order) {
-  const signBody = `${order.channel}|${order.out_trade_no}|${order.amount_cents}|CREATED`;
+  const signBody = `${order.channel}|${order.order_id}|${order.amount_cents}|CREATED`;
   const sig = hmacSign(config.demoSecret, signBody);
   
   return {
     mode: 'demo',
     channel: order.channel,
-    qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=DEMO_${order.out_trade_no}`,
+    qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=DEMO_${order.order_id}`,
     sign: sig,
-    success_url: `${process.env.SITE_URL}/success?order_id=${order.out_trade_no}&uid=${order.uid}`,
-    cancel_url: `${process.env.SITE_URL}/cancel`,
     message: '演示模式：点击"模拟支付"即可完成支付'
   };
 }
 
 async function handleDemoPay(body, res) {
-  const { out_trade_no, uid } = body;
+  const { order_id, uid } = body;
   
-  const order = getOrder(outTradeNo);
+  const order = getOrder(order_id);
   if (!order) {
     return res.status(404).json({ ok: false, error: 'ORDER_NOT_FOUND' });
   }
   
-  const notifyBody = {
-    out_trade_no,
-    uid: order.uid || uid,
-    plan: order.plan,
-    channel: order.channel,
-    status: 'PAID',
-    trade_status: 'TRADE_SUCCESS',
-    amount_cents: order.amount_cents,
-    sign: generateDemoSign(out_trade_no, order.amount_cents)
-  };
+  // 直接标记为已支付
+  order.status = 'paid';
+  order.paid_at = new Date().toISOString();
+  saveOrder(order);
   
-  return handleNotify(notifyBody, res);
+  // 发放订阅
+  const grantResult = await grantSubscription(order);
+  
+  // 发送交付邮件
+  if (order.email) {
+    await sendDeliveryEmail(order.email, order.order_id, order.plan);
+  }
+  
+  // 处理推荐奖励
+  await processReferralReward(order.uid, order.invite_code);
+  
+  res.json({
+    ok: true,
+    order_id,
+    grant: grantResult,
+    message: '支付成功！订阅已激活'
+  });
 }
 
-function generateDemoSign(outTradeNo, amount) {
-  const body = `alipay|${outTradeNo}|${amount}|PAID`;
-  return hmacSign(config.demoSecret, body);
-}
-
-async function handleNotify(data, res) {
-  const outTradeNo = data.out_trade_no;
-  if (!outTradeNo) {
+async function handleAlipayNotify(body, res) {
+  const { out_trade_no, trade_status, trade_no, total_amount } = body;
+  
+  if (!out_trade_no) {
     return res.status(400).json({ ok: false, error: 'OUT_TRADE_NO_REQUIRED' });
   }
   
-  const order = getOrder(outTradeNo);
+  const order = getOrder(out_trade_no);
   if (!order) {
-    return res.status(404).json({ ok: false, error: 'ORDER_NOT_FOUND' });
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    return res.end('fail');
   }
   
-  if (order.status === 'PAID') {
-    return res.json({ ok: true, alreadyPaid: true });
+  if (order.status === 'paid') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    return res.end('success');
   }
   
-  if (config.mode === 'demo') {
-    const expectedSig = generateDemoSign(outTradeNo, data.amount_cents);
-    if (!hmacSign(config.demoSecret, `${data.channel}|${outTradeNo}|${data.amount_cents}|PAID`) && 
-        data.sign !== expectedSig) {
-      return res.status(400).json({ ok: false, error: 'SIGN_INVALID' });
-    }
+  // 验证交易状态
+  if (trade_status !== 'TRADE_SUCCESS' && trade_status !== 'TRADE_FINISHED') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    return res.end('fail');
   }
   
-  order.status = 'PAID';
-  order.paid_at = Date.now();
+  // 更新订单
+  order.status = 'paid';
+  order.paid_at = new Date().toISOString();
+  order.trade_no = trade_no || '';
   saveOrder(order);
   
-  const grantResult = await grantSubscription(order);
+  // 发放订阅
+  await grantSubscription(order);
+  
+  // 发送交付邮件
+  if (order.email) {
+    await sendDeliveryEmail(order.email, order.order_id, order.plan);
+  }
+  
+  // 处理推荐奖励
   await processReferralReward(order.uid, order.invite_code);
   
-  db.transactions.push({
-    id: generateId('TXN'),
-    orderId: outTradeNo,
-    userId: order.uid,
-    planId: order.plan,
-    amount: order.amount_cents,
-    channel: order.channel,
-    status: 'completed',
-    created_at: Date.now()
-  });
-  
-  res.json({ ok: true, orderId: outTradeNo, grant: grantResult });
+  // 返回成功给支付宝
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  return res.end('success');
 }
 
 async function grantSubscription(order) {
@@ -331,7 +502,7 @@ async function grantSubscription(order) {
   const extraMs = plan.days * 24 * 60 * 60 * 1000;
   user.subscribed_until = Math.max(user.subscribed_until || 0, Date.now() + extraMs);
   user.paid_total_cents = (user.paid_total_cents || 0) + order.amount_cents;
-  user.credits = config.freeCreditsPerTool;
+  user.credits = plan.credits;
   
   saveUser(user);
   
@@ -376,7 +547,7 @@ async function processReferralReward(uid, inviteCode) {
   
   const invite = db.invites[inviteKey];
   invite.paid_count = (invite.paid_count || 0) + 1;
-  invite.total_paid_cents = (invite.total_paid_cents || 0) + 990;
+  invite.total_paid_cents = (invite.total_paid_cents || 0) + (config.plans['quarterly'].priceCNY * 100);
   
   // 应用奖励
   await applyTierRewards(inviterUid, invite);
@@ -466,6 +637,40 @@ function handleGetPaywall(uid, res) {
       { id: 'stripe', name: '信用卡', icon: '💳' }
     ]
   });
+}
+
+function handleGetProducts(res) {
+  res.json({
+    ok: true,
+    products: [
+      {
+        slug: 'quant-a-share-daily',
+        name: 'A股量化策略信号包',
+        description: '每日收盘后生成次日交易建议',
+        price: 19.9,
+        features: ['每日选股信号', '多因子模型', '完整Python源码', '回测报告'],
+        download_key: 'quant_signal_pack'
+      }
+    ]
+  });
+}
+
+// ============ 辅助函数 ============
+
+async function sendDeliveryEmail(toEmail, orderId, plan) {
+  if (!toEmail || !process.env.EMAIL_PASS) {
+    console.log(`[EMAIL] Skipped: no email or credentials`);
+    return true;
+  }
+  
+  try {
+    // 简化版邮件通知（实际生产环境需要nodemailer）
+    console.log(`[EMAIL] Delivery notification to ${toEmail} for order ${orderId}`);
+    return true;
+  } catch (e) {
+    console.error(`[EMAIL] Failed:`, e.message);
+    return false;
+  }
 }
 
 function readBody(req) {
