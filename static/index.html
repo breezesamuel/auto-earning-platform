@@ -1,0 +1,789 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Money Maker Pro - 璁㈤槄涓績 (瀹屾暣鐗?</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+        
+        .header h1 { font-size: 3rem; margin-bottom: 16px; }
+        .header p { font-size: 1.25rem; opacity: 0.9; }
+        
+        /* 璁㈤槄鐘舵€侀潰鏉?*/
+        .subscription-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        
+        .status-badge.active { background: #d1fae5; color: #065f46; }
+        .status-badge.locked { background: #fee2e2; color: #991b1b; }
+        
+        .credits-display {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        
+        .credit-item { flex: 1; min-width: 200px; }
+        .credit-label { color: #6b7280; font-size: 0.875rem; margin-bottom: 4px; }
+        .credit-value { font-size: 2rem; font-weight: 700; color: #333; }
+        
+        /* 瀹氫环鍗＄墖 */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 32px;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .pricing-card.featured {
+            border: 3px solid #667eea;
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured:hover { transform: scale(1.05) translateY(-8px); }
+        
+        .badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .plan-name { font-size: 1.5rem; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .plan-description { color: #666; font-size: 0.95rem; margin-bottom: 24px; }
+        
+        .price {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .price span { font-size: 1rem; font-weight: 400; color: #999; }
+        
+        .original-price {
+            font-size: 1.25rem;
+            color: #999;
+            text-decoration: line-through;
+            margin-bottom: 24px;
+        }
+        
+        .features { list-style: none; margin-bottom: 32px; }
+        
+        .features li {
+            padding: 10px 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .features li::before {
+            content: "鉁?;
+            width: 20px;
+            height: 20px;
+            background: #10b981;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+        
+        .cta-button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .cta-button.primary:hover { opacity: 0.9; transform: scale(1.02); }
+        .cta-button.secondary { background: #f3f4f6; color: #333; }
+        .cta-button.secondary:hover { background: #e5e7eb; }
+        
+        /* 鏀粯鏂瑰紡 */
+        .payment-methods {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .payment-method {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-method:hover { border-color: #667eea; transform: scale(1.05); }
+        .payment-method.selected { border-color: #667eea; background: #f3f4ff; }
+        
+        .payment-icon { font-size: 2.5rem; margin-bottom: 8px; }
+        .payment-name { font-weight: 600; color: #333; }
+        
+        /* 妯℃€佹 */
+        .subscription-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .subscription-modal.active { display: flex; }
+        
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: #666;
+        }
+        
+        .modal-close:hover { background: #e5e7eb; }
+        
+        .modal-header { text-align: center; margin-bottom: 32px; }
+        .modal-icon { font-size: 4rem; margin-bottom: 16px; }
+        .modal-title { font-size: 1.75rem; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .modal-subtitle { color: #666; font-size: 1rem; }
+        
+        .free-credits {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .free-credits p { color: #92400e; font-weight: 600; }
+        
+        .modal-features { list-style: none; margin-bottom: 32px; }
+        
+        .modal-features li {
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #374151;
+        }
+        
+        .modal-features li::before { content: "鉁?; font-size: 1.25rem; }
+        
+        .modal-cta {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        
+        .modal-cta:hover { opacity: 0.9; }
+        
+        .modal-secondary {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: #666;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .modal-secondary:hover { background: #f9fafb; }
+        
+        .trust-signals {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .trust-signal {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        /* 鏀粯缁撴灉 */
+        .payment-result { text-align: center; padding: 20px; }
+        .success-icon { font-size: 4rem; margin-bottom: 16px; }
+        .result-title { font-size: 1.5rem; font-weight: 700; color: #333; margin-bottom: 8px; }
+        .result-message { color: #666; margin-bottom: 24px; }
+        
+        /* QR鐮佹樉绀?*/
+        .qr-display {
+            background: #f3f4f6;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            background: white;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: #666;
+            border: 2px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>馃挵 AI Money Maker Pro</h1>
+            <p>Make money online with AI automation</p>
+        </div>
+
+        <!-- Subscription Status Panel -->
+        <div class="subscription-panel" id="subscriptionPanel">
+            <h2>馃搳 Your Subscription Status</h2>
+            <div class="credits-display">
+                <div class="credit-item">
+                    <div class="credit-label">Current Plan</div>
+                    <div class="credit-value" id="currentPlan">Free</div>
+                    <span class="status-badge locked" id="statusBadge">馃敀 Locked</span>
+                </div>
+                <div class="credit-item">
+                    <div class="credit-label">Remaining Credits</div>
+                    <div class="credit-value" id="remainingCredits">3 / 3</div>
+                </div>
+                <div class="credit-item">
+                    <div class="credit-label">Monthly Usage</div>
+                    <div class="credit-value" id="monthlyUsage">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Grid -->
+        <div class="pricing-grid">
+            <!-- Monthly Plan -->
+            <div class="pricing-card">
+                <div class="plan-name">鏈堝害璁㈤槄</div>
+                <div class="plan-description">閫傚悎涓汉鐢ㄦ埛璧锋浣跨敤</div>
+                <div class="price">楼29<span>/鏈?/span></div>
+                <div class="original-price">楼39/鏈?/div>
+                <ul class="features">
+                    <li>500娆I鐢熸垚棰濆害</li>
+                    <li>鍩虹AI宸ュ叿璁块棶</li>
+                    <li>绀惧尯鏀寔</li>
+                    <li>閭欢妯℃澘搴?/li>
+                    <li>鍩虹鏁版嵁鍒嗘瀽</li>
+                </ul>
+                <button class="cta-button secondary" onclick="showSubscriptionModal('monthly')">寮€濮嬪厤璐硅瘯鐢?/button>
+            </div>
+
+            <!-- Quarterly Plan (Featured) -->
+            <div class="pricing-card featured">
+                <div class="badge">鏈€鍙楁杩?/div>
+                <div class="plan-name">瀛ｅ害璁㈤槄</div>
+                <div class="plan-description">鏈€閫傚悎鎴愰暱鍨嬩紒涓?/div>
+                <div class="price">楼25<span>/鏈?/span></div>
+                <div class="original-price">楼35/鏈?/div>
+                <ul class="features">
+                    <li>1800娆I鐢熸垚棰濆害</li>
+                    <li>鍏ㄩ儴AI宸ュ叿璁块棶</li>
+                    <li>浼樺厛瀹㈡湇鏀寔</li>
+                    <li>楂樼骇妯℃澘搴?/li>
+                    <li>瀹炴椂鏁版嵁鍒嗘瀽</li>
+                    <li>鍥㈤槦鍗忎綔锛?浜猴級</li>
+                    <li>API璁块棶鏉冮檺</li>
+                </ul>
+                <button class="cta-button primary" onclick="showSubscriptionModal('quarterly')">寮€濮嬪厤璐硅瘯鐢?/button>
+            </div>
+
+            <!-- Yearly Plan -->
+            <div class="pricing-card">
+                <div class="plan-name">骞村害璁㈤槄</div>
+                <div class="plan-description">澶у瀷鍥㈤槦鍜屽畾鍒跺寲闇€姹?/div>
+                <div class="price">楼99<span>/骞?/span></div>
+                <div class="original-price">楼156/骞?/div>
+                <ul class="features">
+                    <li>7500娆I鐢熸垚棰濆害</li>
+                    <li>鍏ㄩ儴AI宸ュ叿+瀹氬埗妯″瀷</li>
+                    <li>涓撳睘瀹㈡埛缁忕悊</li>
+                    <li>鑷畾涔夐泦鎴?/li>
+                    <li>楂樼骇瀹夊叏淇濋殰</li>
+                    <li>鏃犻檺鍥㈤槦鎴愬憳</li>
+                    <li>SLA鏈嶅姟淇濋殰</li>
+                    <li>涓婇棬鍩硅鏈嶅姟</li>
+                </ul>
+                <button class="cta-button secondary" onclick="showSubscriptionModal('yearly')">鑱旂郴閿€鍞?/button>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="payment-methods">
+            <h2>馃挸 鏀寔鐨勬敮浠樻柟寮?/h2>
+            <div class="payment-grid">
+                <div class="payment-method" onclick="selectPaymentMethod(this, 'alipay')">
+                    <div class="payment-icon">馃數</div>
+                    <div class="payment-name">鏀粯瀹?/div>
+                    <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">Alipay</div>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod(this, 'wechat')">
+                    <div class="payment-icon">馃煝</div>
+                    <div class="payment-name">寰俊鏀粯</div>
+                    <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">WeChat Pay</div>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod(this, 'stripe')">
+                    <div class="payment-icon">馃挸</div>
+                    <div class="payment-name">淇＄敤鍗?/div>
+                    <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">Stripe Secure</div>
+                </div>
+                <div class="payment-method selected" onclick="selectPaymentMethod(this, 'demo')">
+                    <div class="payment-icon">馃И</div>
+                    <div class="payment-name">Demo妯″紡</div>
+                    <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">绔嬪嵆浣撻獙</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guarantee -->
+        <div class="subscription-panel" style="text-align: center;">
+            <h2>馃敀 鎴戜滑鐨勬壙璇?/h2>
+            <p style="color: #666; font-size: 1.1rem; margin-top: 12px;">
+                30澶╂棤鐞嗙敱閫€娆?| 鈿?5鍒嗛挓蹇€熷紑閫?| 馃幆 闅忔椂鍙栨秷
+            </p>
+        </div>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div class="subscription-modal" id="subscriptionModal">
+        <div class="modal-content" id="modalContent">
+            <!-- Content will be dynamically inserted -->
+        </div>
+    </div>
+
+    <script>
+        // 鍏ㄥ眬鐘舵€?        let selectedPlan = null;
+        let selectedPaymentMethod = 'demo';
+        let userCredits = 3;
+        let userPlan = 'free';
+        let userId = localStorage.getItem('user_id') || 'user_' + Date.now();
+
+        // 淇濆瓨鐢ㄦ埛ID
+        if (!localStorage.getItem('user_id')) {
+            localStorage.setItem('user_id', userId);
+        }
+
+        // 閫夋嫨鏀粯鏂瑰紡
+        function selectPaymentMethod(element, method) {
+            document.querySelectorAll('.payment-method').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedPaymentMethod = method;
+        }
+
+        // 鏄剧ず璁㈤槄澧欏脊绐?        function showSubscriptionModal(planId) {
+            selectedPlan = planId;
+            const modal = document.getElementById('subscriptionModal');
+            const content = document.getElementById('modalContent');
+            
+            const planData = {
+                monthly: { name: '鏈堝害', price: 29, credits: 500, originalPrice: 39 },
+                quarterly: { name: '瀛ｅ害', price: 25, credits: 1800, originalPrice: 35 },
+                yearly: { name: '骞村害', price: 99, credits: 7500, originalPrice: 156 }
+            };
+            
+            const plan = planData[planId];
+            
+            content.innerHTML = `
+                <button class="modal-close" onclick="closeSubscriptionModal()">脳</button>
+                
+                <div class="modal-header">
+                    <div class="modal-icon">馃帀</div>
+                    <h2 class="modal-title">鎮ㄥ凡杈惧埌鍏嶈垂棰濆害涓婇檺锛?/h2>
+                    <p class="modal-subtitle">瑙ｉ攣鏃犻檺AI璧氶挶鍔熻兘锛屽紑鍚偍鐨勮储瀵岃嚜鐢变箣璺?/p>
+                </div>
+
+                <div class="free-credits">
+                    <p>鈿?鎮ㄥ凡鐢ㄥ畬 ${userCredits} 涓厤璐圭Н鍒?/p>
+                </div>
+
+                <ul class="modal-features">
+                    <li>${plan.credits.toLocaleString()} 娆I鐢熸垚棰濆害</li>
+                    <li>鍏ㄩ儴楂樼骇鍔熻兘瑙ｉ攣</li>
+                    <li>浼樺厛瀹㈡湇鏀寔</li>
+                    <li>鏃犳按鍗板唴瀹逛笅杞?/li>
+                    <li>鍟嗕笟浣跨敤鏉冭祫浜?/li>
+                </ul>
+
+                <div style="margin: 20px 0; padding: 16px; background: #f3f4f6; border-radius: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 1.25rem; font-weight: 600; color: #333;">
+                            楼${plan.price} <span style="font-size: 0.875rem; color: #666; font-weight: 400;">/${plan.name}</span>
+                        </span>
+                        <span style="text-decoration: line-through; color: #999;">楼${plan.originalPrice}</span>
+                    </div>
+                    <div style="margin-top: 8px; color: #10b981; font-weight: 600;">
+                        绔嬬渷 楼${(plan.originalPrice - plan.price) * (planId === 'quarterly' ? 3 : planId === 'yearly' ? 12 : 1)}!
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <p style="color: #666; font-size: 0.875rem; margin-bottom: 8px;">閫夋嫨鏀粯鏂瑰紡锛?/p>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="processPayment('demo')" style="flex: 1; padding: 12px; border: 2px solid #667eea; background: #667eea; color: white; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            馃И Demo婕旂ず
+                        </button>
+                        <button onclick="processPayment('alipay')" style="flex: 1; padding: 12px; border: 2px solid #e5e7eb; background: white; color: #333; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            馃數 鏀粯瀹?                        </button>
+                        <button onclick="processPayment('wechat')" style="flex: 1; padding: 12px; border: 2px solid #e5e7eb; background: white; color: #333; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            馃煝 寰俊
+                        </button>
+                    </div>
+                </div>
+
+                <button class="modal-cta" onclick="processPayment('${selectedPaymentMethod}')">
+                    馃殌 绔嬪嵆璁㈤槄 - 楼${plan.price} (${plan.credits.toLocaleString()} 绉垎)
+                </button>
+                
+                <button class="modal-secondary" onclick="closeSubscriptionModal()">
+                    绋嶅悗鍐嶈
+                </button>
+
+                <div class="trust-signals">
+                    <span class="trust-signal">鉁?鏃犻渶淇＄敤鍗?/span>
+                    <span class="trust-signal">鉁?闅忔椂鍙栨秷</span>
+                    <span class="trust-signal">鉁?30澶╅€€娆句繚璇?/span>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 澶勭悊鏀粯
+        async function processPayment(method) {
+            const modal = document.getElementById('subscriptionModal');
+            const content = document.getElementById('modalContent');
+            
+            if (method === 'demo') {
+                // Demo妯″紡锛氭ā鎷熸敮浠樻垚鍔?                await simulatePayment();
+            } else {
+                // 鐪熷疄鏀粯娴佺▼
+                await realPayment(method);
+            }
+        }
+
+        // 妯℃嫙鏀粯锛圖emo妯″紡锛?        async function simulatePayment() {
+            const content = document.getElementById('modalContent');
+            
+            content.innerHTML = `
+                <div class="payment-result">
+                    <div class="success-icon">鉁?/div>
+                    <h3 class="result-title">鏀粯鎴愬姛锛侊紙Demo妯″紡锛?/h3>
+                    <p class="result-message">鎮ㄧ殑璁㈤槄宸茬敓鏁堬紝鎵€鏈夊姛鑳藉凡瑙ｉ攣锛?br><small style="color: #666;">杩欐槸婕旂ず妯″紡锛屼笉浼氫骇鐢熺湡瀹炴墸璐广€?/small></p>
+                    <button class="modal-cta" onclick="closeSubscriptionModal(); updateUI();">
+                        寮€濮嬩娇鐢?                    </button>
+                </div>
+            `;
+            
+            // 鏇存柊鐢ㄦ埛鐘舵€?            userPlan = selectedPlan;
+            userCredits = 999999;
+            
+            localStorage.setItem('userPlan', selectedPlan);
+            localStorage.setItem('userCredits', 999999);
+        }
+
+        // 鐪熷疄鏀粯娴佺▼
+        async function realPayment(method) {
+            const content = document.getElementById('modalContent');
+            
+            try {
+                // 鍒涘缓璁㈠崟
+                const orderResponse = await fetch('/api/payment/create-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userId,
+                        planId: selectedPlan,
+                        channel: method
+                    })
+                });
+                
+                const orderResult = await orderResponse.json();
+                
+                if (orderResult.ok && orderResult.pay) {
+                    const pay = orderResult.pay;
+                    
+                    if (pay.mode === 'demo') {
+                        // Demo妯″紡鐩存帴鎴愬姛
+                        await simulatePayment();
+                    } else if (pay.channel === 'alipay') {
+                        // 鏄剧ず鏀粯瀹濅簩缁寸爜
+                        showQRCode(content, '鏀粯瀹?, pay.qr_code_url || 'https://qr.alipay.com/demo');
+                    } else if (pay.channel === 'wechat') {
+                        // 鏄剧ず寰俊鏀粯浜岀淮鐮?                        showQRCode(content, '寰俊鏀粯', pay.code_url || 'weixin://wxpay/bizpayurl?sr=demo');
+                    } else if (pay.channel === 'stripe') {
+                        // 璺宠浆鍒癝tripe Checkout
+                        if (pay.checkout_url) {
+                            window.location.href = pay.checkout_url;
+                        } else {
+                            await simulatePayment();
+                        }
+                    }
+                } else {
+                    alert('鍒涘缓璁㈠崟澶辫触: ' + (orderResult.error || '鏈煡閿欒'));
+                }
+            } catch (error) {
+                console.error('Payment error:', error);
+                // 濡傛灉API璋冪敤澶辫触锛屼娇鐢╠emo妯″紡浣滀负澶囩敤
+                await simulatePayment();
+            }
+        }
+
+        // 鏄剧ずQR鐮佹敮浠橀〉闈?        function showQRCode(content, channelName, qrUrl) {
+            content.innerHTML = `
+                <button class="modal-close" onclick="closeSubscriptionModal()">脳</button>
+                
+                <div class="payment-result">
+                    <div class="modal-icon">馃摫</div>
+                    <h3 class="result-title">璇蜂娇鐢?{channelName}鎵爜鏀粯</h3>
+                    <p class="result-message">璁㈠崟鍙? ${Date.now().toString(36).toUpperCase()}</p>
+                    
+                    <div class="qr-display">
+                        <div class="qr-code">
+                            <div style="text-align: center;">
+                                <div style="font-size: 3rem;">馃摫</div>
+                                <div>${channelName}浜岀淮鐮?/div>
+                                <div style="font-size: 0.75rem; color: #999; margin-top: 8px;">鎵弿涓婃柟浜岀淮鐮佸畬鎴愭敮浠?/div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px; font-size: 1.5rem; font-weight: 700; color: #333;">
+                            楼${getPlanPrice(selectedPlan)}
+                        </div>
+                    </div>
+                    
+                    <button class="modal-cta" onclick="confirmPayment()">
+                        鉁?鎴戝凡瀹屾垚鏀粯
+                    </button>
+                    
+                    <button class="modal-secondary" onclick="closeSubscriptionModal()">
+                        鍙栨秷
+                    </button>
+                    
+                    <p style="margin-top: 16px; color: #666; font-size: 0.875rem;">
+                        Demo妯″紡锛氱偣鍑?鎴戝凡瀹屾垚鏀粯"鍗冲彲妯℃嫙鍒拌处
+                    </p>
+                </div>
+            `;
+        }
+
+        // 纭鏀粯
+        async function confirmPayment() {
+            const content = document.getElementById('modalContent');
+            
+            // 妯℃嫙鏀粯鎴愬姛
+            content.innerHTML = `
+                <div class="payment-result">
+                    <div class="success-icon">鉁?/div>
+                    <h3 class="result-title">鏀粯鎴愬姛锛?/h3>
+                    <p class="result-message">鎮ㄧ殑璁㈤槄宸茬敓鏁堬紝鎵€鏈夊姛鑳藉凡瑙ｉ攣锛?/p>
+                    <button class="modal-cta" onclick="closeSubscriptionModal(); updateUI();">
+                        寮€濮嬩娇鐢?                    </button>
+                </div>
+            `;
+            
+            // 鏇存柊鐢ㄦ埛鐘舵€?            userPlan = selectedPlan;
+            userCredits = getPlanCredits(selectedPlan);
+            
+            localStorage.setItem('userPlan', selectedPlan);
+            localStorage.setItem('userCredits', userCredits);
+        }
+
+        // 鍏抽棴寮圭獥
+        function closeSubscriptionModal() {
+            document.getElementById('subscriptionModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // 鑾峰彇濂楅浠锋牸
+        function getPlanPrice(planId) {
+            const prices = { monthly: 29, quarterly: 25, yearly: 99 };
+            return prices[planId] || 29;
+        }
+
+        // 鑾峰彇濂楅绉垎
+        function getPlanCredits(planId) {
+            const credits = { monthly: 500, quarterly: 1800, yearly: 7500 };
+            return credits[planId] || 500;
+        }
+
+        // 鏇存柊UI鐘舵€?        function updateUI() {
+            const currentPlanEl = document.getElementById('currentPlan');
+            const statusBadge = document.getElementById('statusBadge');
+            const remainingCredits = document.getElementById('remainingCredits');
+            const monthlyUsage = document.getElementById('monthlyUsage');
+            
+            if (userPlan !== 'free') {
+                currentPlanEl.textContent = userPlan.charAt(0).toUpperCase() + userPlan.slice(1);
+                statusBadge.textContent = '鉁?宸叉縺娲?;
+                statusBadge.className = 'status-badge active';
+                remainingCredits.textContent = userCredits.toLocaleString();
+                monthlyUsage.textContent = '0%';
+            } else {
+                currentPlanEl.textContent = 'Free';
+                statusBadge.textContent = '馃敀 鏈縺娲?;
+                statusBadge.className = 'status-badge locked';
+                remainingCredits.textContent = `${userCredits} / 3`;
+                monthlyUsage.textContent = '0%';
+            }
+        }
+
+        // 鍒濆鍖?        document.addEventListener('DOMContentLoaded', () => {
+            // 浠巐ocalStorage鍔犺浇鐢ㄦ埛鐘舵€?            const savedPlan = localStorage.getItem('userPlan');
+            const savedCredits = localStorage.getItem('userCredits');
+            
+            if (savedPlan) {
+                userPlan = savedPlan;
+            }
+            if (savedCredits) {
+                userCredits = parseInt(savedCredits);
+            }
+            
+            updateUI();
+            
+            // 妯℃嫙浣跨敤鍏嶈垂棰濆害
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('feature-btn')) {
+                    if (userCredits <= 0 && userPlan === 'free') {
+                        showSubscriptionModal('quarterly');
+                    } else if (userPlan === 'free') {
+                        userCredits--;
+                        localStorage.setItem('userCredits', userCredits);
+                        updateUI();
+                    }
+                }
+            });
+        });
+
+        // 鐐瑰嚮澶栭儴鍏抽棴寮圭獥
+        document.getElementById('subscriptionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSubscriptionModal();
+            }
+        });
+
+        // ESC閿叧闂脊绐?        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSubscriptionModal();
+            }
+        });
+    </script>
+</body>
+</html>
+

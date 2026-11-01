@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Money Maker Pro - Pricing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        .header p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 32px;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .pricing-card.featured {
+            border: 3px solid #667eea;
+            transform: scale(1.05);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-8px);
+        }
+
+        .badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .plan-description {
+            color: #666;
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+
+        .price {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #999;
+        }
+
+        .original-price {
+            font-size: 1.25rem;
+            color: #999;
+            text-decoration: line-through;
+            margin-bottom: 24px;
+        }
+
+        .features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .features li {
+            padding: 10px 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .features li::before {
+            content: "✓";
+            width: 20px;
+            height: 20px;
+            background: #10b981;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .cta-button.primary:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .cta-button.secondary {
+            background: #f3f4f6;
+            color: #333;
+        }
+
+        .cta-button.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .guarantee {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+        }
+
+        .guarantee p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Subscription Wall Modal */
+        .subscription-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .subscription-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #f3f4f6;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            color: #666;
+        }
+
+        .modal-close:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .modal-subtitle {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .free-credits {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .free-credits p {
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .modal-features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .modal-features li {
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #374151;
+        }
+
+        .modal-features li::before {
+            content: "✨";
+            font-size: 1.25rem;
+        }
+
+        .modal-cta {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+
+        .modal-cta:hover {
+            opacity: 0.9;
+        }
+
+        .modal-secondary {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: #666;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .modal-secondary:hover {
+            background: #f9fafb;
+        }
+
+        .trust-signals {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .trust-signal {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        /* Content Paywall Demo */
+        .content-section {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            margin-top: 40px;
+        }
+
+        .content-preview {
+            max-height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .content-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, white);
+        }
+
+        .content-body h2 {
+            color: #333;
+            margin-bottom: 16px;
+        }
+
+        .content-body p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .paywall-overlay {
+            display: none;
+            position: relative;
+            margin-top: 20px;
+            padding: 30px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .paywall-overlay.active {
+            display: block;
+        }
+
+        .paywall-overlay h3 {
+            color: #92400e;
+            margin-bottom: 12px;
+        }
+
+        .paywall-overlay p {
+            color: #78350f;
+            margin-bottom: 20px;
+        }
+
+        .paywall-btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Feature Wall Demo */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature-item {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: scale(1.05);
+        }
+
+        .feature-item.locked {
+            opacity: 0.7;
+            position: relative;
+        }
+
+        .feature-item.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.25rem;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+        }
+
+        .feature-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .feature-desc {
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .pro-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>💰 AI Money Maker Pro</h1>
+            <p>Make money online with AI automation</p>
+        </div>
+
+        <!-- Pricing Grid -->
+        <div class="pricing-grid">
+            <!-- Starter Plan -->
+            <div class="pricing-card">
+                <div class="plan-name">Starter</div>
+                <div class="plan-description">Perfect for individuals getting started</div>
+                <div class="price">$29<span>/month</span></div>
+                <div class="original-price">$39/month</div>
+                <ul class="features">
+                    <li>500 AI generations/month</li>
+                    <li>Basic AI tools access</li>
+                    <li>Community support</li>
+                    <li>Email templates library</li>
+                    <li>Basic analytics</li>
+                </ul>
+                <button class="cta-button secondary" onclick="showSubscriptionModal()">Start Free Trial</button>
+            </div>
+
+            <!-- Professional Plan (Featured) -->
+            <div class="pricing-card featured">
+                <div class="badge">MOST POPULAR</div>
+                <div class="plan-name">Professional</div>
+                <div class="plan-description">Best for growing businesses</div>
+                <div class="price">$79<span>/month</span></div>
+                <div class="original-price">$129/month</div>
+                <ul class="features">
+                    <li>2,000 AI generations/month</li>
+                    <li>All AI tools access</li>
+                    <li>Priority support</li>
+                    <li>Advanced templates</li>
+                    <li>Real-time analytics</li>
+                    <li>Team collaboration (3 seats)</li>
+                    <li>API access</li>
+                </ul>
+                <button class="cta-button primary" onclick="showSubscriptionModal()">Start Free Trial</button>
+            </div>
+
+            <!-- Enterprise Plan -->
+            <div class="pricing-card">
+                <div class="plan-name">Enterprise</div>
+                <div class="plan-description">For large teams and custom needs</div>
+                <div class="price">$299<span>/month</span></div>
+                <div class="original-price">$499/month</div>
+                <ul class="features">
+                    <li>Unlimited AI generations</li>
+                    <li>All AI tools + custom models</li>
+                    <li>Dedicated account manager</li>
+                    <li>Custom integrations</li>
+                    <li>Advanced security</li>
+                    <li>Unlimited team seats</li>
+                    <li>SLA guarantee</li>
+                    <li>Onboarding training</li>
+                </ul>
+                <button class="cta-button secondary" onclick="showSubscriptionModal()">Contact Sales</button>
+            </div>
+        </div>
+
+        <!-- Trust Signals -->
+        <div class="guarantee">
+            <p>🔒 30-day money-back guarantee | ⚡ Setup in 5 minutes | 🎯 Cancel anytime</p>
+        </div>
+
+        <!-- Content Paywall Demo -->
+        <div class="content-section">
+            <h2 style="margin-bottom: 20px; color: #333;">📖 Free Article Preview</h2>
+            <div class="content-preview">
+                <div class="content-body">
+                    <h2>How I Made $10,000/Month Using AI Tools</h2>
+                    <p>In this comprehensive guide, I'll show you exactly how I built a six-figure business using nothing but AI tools and automation...</p>
+                    <p>The key insight nobody talks about is that AI isn't replacing humans - it's amplifying our abilities. When you combine human creativity with AI's processing power, the results are exponential...</p>
+                    <p>Step 1: Choose the Right Platform<br>Start with platforms that have high demand and low competition...</p>
+                    <p>Step 2: Create High-Value Content<br>Use AI to generate content faster while maintaining quality...</p>
+                    <p>Step 3: Build an Audience<br>Leverage social media and SEO to attract your target market...</p>
+                </div>
+            </div>
+            
+            <!-- Paywall Overlay -->
+            <div class="paywall-overlay active" id="contentPaywall">
+                <h3>🔒 Unlock the Full Guide + Bonus Templates</h3>
+                <p>Get the complete strategy, 50+ templates, and video tutorials for just $29/month</p>
+                <a href="#" class="paywall-btn" onclick="showSubscriptionModal()">Subscribe Now - Start Free Trial</a>
+            </div>
+        </div>
+
+        <!-- Feature Wall Demo -->
+        <h2 style="margin-top: 60px; margin-bottom: 20px; color: white;">🛠️ Features Overview</h2>
+        <div class="feature-grid">
+            <div class="feature-item">
+                <div class="feature-icon">🤖</div>
+                <div class="feature-name">AI Chatbot Builder</div>
+                <div class="feature-desc">Build custom chatbots</div>
+                <span class="pro-badge">PRO</span>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">✍️</div>
+                <div class="feature-name">Content Generator</div>
+                <div class="feature-desc">Generate blog posts</div>
+            </div>
+            <div class="feature-item locked" onclick="showFeaturePaywall()">
+                <div class="feature-icon">📊</div>
+                <div class="feature-name">Advanced Analytics</div>
+                <div class="feature-desc">Real-time insights</div>
+                <span class="pro-badge">PRO</span>
+            </div>
+            <div class="feature-item locked" onclick="showFeaturePaywall()">
+                <div class="feature-icon">👥</div>
+                <div class="feature-name">Team Collaboration</div>
+                <div class="feature-desc">Work together</div>
+                <span class="pro-badge">PRO</span>
+            </div>
+            <div class="feature-item locked" onclick="showFeaturePaywall()">
+                <div class="feature-icon">🔌</div>
+                <div class="feature-name">API Access</div>
+                <div class="feature-desc">Integrate anywhere</div>
+                <span class="pro-badge">ENTERPRISE</span>
+            </div>
+            <div class="feature-item locked" onclick="showFeaturePaywall()">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-name">Custom GPTs</div>
+                <div class="feature-desc">Train your own AI</div>
+                <span class="pro-badge">ENTERPRISE</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscription Modal -->
+    <div class="subscription-modal" id="subscriptionModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeSubscriptionModal()">×</button>
+            
+            <div class="modal-header">
+                <div class="modal-icon">🎉</div>
+                <h2 class="modal-title">You've Reached Your Limit!</h2>
+                <p class="modal-subtitle">Unlock unlimited access to all features</p>
+            </div>
+
+            <div class="free-credits">
+                <p>⚡ You've used your 3 free credits</p>
+            </div>
+
+            <ul class="modal-features">
+                <li>Unlimited AI generations</li>
+                <li>All premium features included</li>
+                <li>Priority customer support</li>
+                <li>No watermarks on content</li>
+                <li>Download commercial-use assets</li>
+            </ul>
+
+            <button class="modal-cta" onclick="startFreeTrial()">
+                🚀 Start 14-Day Free Trial
+            </button>
+            
+            <button class="modal-secondary" onclick="closeSubscriptionModal()">
+                View All Pricing Plans
+            </button>
+
+            <div class="trust-signals">
+                <span class="trust-signal">✓ No credit card required</span>
+                <span class="trust-signal">✓ Cancel anytime</span>
+                <span class="trust-signal">✓ 30-day guarantee</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show subscription modal
+        function showSubscriptionModal() {
+            document.getElementById('subscriptionModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close subscription modal
+        function closeSubscriptionModal() {
+            document.getElementById('subscriptionModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Start free trial
+        function startFreeTrial() {
+            alert('🎉 Redirecting to signup page...\n\nIn production, this would:\n1. Create a free trial account\n2. Store subscription preference\n3. Redirect to dashboard\n4. Set cookie for 14-day trial period');
+            closeSubscriptionModal();
+        }
+
+        // Show feature paywall
+        function showFeaturePaywall() {
+            showSubscriptionModal();
+        }
+
+        // Close modal on outside click
+        document.getElementById('subscriptionModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSubscriptionModal();
+            }
+        });
+
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSubscriptionModal();
+            }
+        });
+    </script>
+</body>
+</html>

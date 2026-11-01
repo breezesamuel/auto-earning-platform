@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "auto-earning-platform",
+  "builds": [
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "*.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/payment/(.*)", "dest": "/api/payment/$1" },
+    { "src": "/(.*)", "dest": "/static/$1" }
+  ],
+  "env": {
+    "PAY_MODE": "demo",
+    "CURRENCY": "CNY",
+    "EXCHANGE_RATE": "7.2",
+    "SITE_URL": "https://auto-earning-platform.vercel.app"
+  }
+}
